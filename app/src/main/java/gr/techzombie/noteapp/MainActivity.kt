@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        daList.adapter = MyNotesAdapter(listOfNotes)
+        //daList.adapter = MyNotesAdapter(this,listOfNotes) //         DEL      ?????
 
 
         loadQuery("%")
@@ -49,20 +49,37 @@ class MainActivity : AppCompatActivity() {
                 listOfNotes.add(Note(ID,title,description))
             }while(cursor.moveToNext())
         }
-        daList.adapter = MyNotesAdapter(listOfNotes)
+        daList.adapter = MyNotesAdapter(this,listOfNotes)
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadQuery("%")
     }
 
     inner class MyNotesAdapter:BaseAdapter {
         var listOfNotes = ArrayList<Note>()
-        constructor(listOfNotes:ArrayList<Note>){
+        var context:Context?=null
+        constructor(context: Context, listOfNotes:ArrayList<Note>){
             this.listOfNotes=listOfNotes
+            this.context=context
         }
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             var myView = layoutInflater.inflate(R.layout.ticket,null)
+            var myNote = listOfNotes[position]
             myView.id = listOfNotes[position].id!!
             myView.tilte.text = listOfNotes[position].title
             myView.description.text = listOfNotes[position].description
+            myView.ivDelete.setOnClickListener(View.OnClickListener {
+                var dbManager = DbManager(this.context!!)
+                val selectionArgs = arrayOf(myView.id.toString())
+                dbManager.deleteDB("ID=?",selectionArgs)
+                loadQuery("%")
+            })
+            myView.ivEdit.setOnClickListener(View.OnClickListener {
+                goToUpdate(myNote)
+            })
             return  myView
 
         }
@@ -113,6 +130,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun goToUpdate(note:Note){
+        var intent = Intent(this,AddNote::class.java)
+        intent.putExtra("ID",note.id)
+        intent.putExtra("Title",note.title)
+        intent.putExtra("Description",note.description)
+        startActivity(intent)
     }
 
 }

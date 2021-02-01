@@ -23,10 +23,10 @@
         <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" app:srcCompat="@drawable/round_edit_black_18dp"
-                android:id="@+id/imageView2" android:padding="2pt"/>
+                android:id="@+id/ivEdit" android:padding="2pt"/>
         <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" app:srcCompat="@drawable/round_delete_black_18dp"
-                android:id="@+id/imageView" android:padding="2pt"/>
+                android:id="@+id/ivDelete" android:padding="2pt"/>
     </LinearLayout>
 </LinearLayout>
