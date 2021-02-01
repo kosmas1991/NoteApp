@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.SearchView
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_add_note.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.ticket.view.*
 
@@ -23,9 +24,33 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         daList.adapter = MyNotesAdapter(listOfNotes)
 
-        listOfNotes.add(Note(1,"Go to job","Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum."))
-        listOfNotes.add(Note(2,"Go to zoo","Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum."))
-        listOfNotes.add(Note(3,"Go to mom","Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum."))
+
+        loadQuery("%")
+
+
+
+
+//        listOfNotes.add(Note(1,"Go to job","Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum."))
+//        listOfNotes.add(Note(2,"Go to zoo","Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum."))
+//        listOfNotes.add(Note(3,"Go to mom","Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum."))
+    }
+
+    fun loadQuery(title:String) {
+        var dbManager = DbManager(this)
+        val projections = arrayOf("ID","title","description")
+        val selectionArgs = arrayOf(title)
+        val cursor = dbManager.queryDB(projections,"Title like ?",selectionArgs,"Title")
+        listOfNotes.clear()
+        if(cursor.moveToFirst()){
+            do{
+                val ID=cursor.getInt(cursor.getColumnIndex("ID"))
+                val title=cursor.getString(cursor.getColumnIndex("Title"))
+                val description=cursor.getString(cursor.getColumnIndex("Description"))
+                listOfNotes.add(Note(ID,title,description))
+            }while(cursor.moveToNext())
+        }
+        daList.adapter = MyNotesAdapter(listOfNotes)
+
     }
 
     inner class MyNotesAdapter:BaseAdapter {
@@ -65,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 Toast.makeText(applicationContext,query,Toast.LENGTH_LONG).show()
-                //TODO: search database
+                loadQuery("%"+query+"%")
                 return false
             }
 
